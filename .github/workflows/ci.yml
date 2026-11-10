@@ -1,0 +1,28 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  host:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e 'host[dev]'
+      - run: pytest host
+
+  firmware:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: arduino/setup-arduino-cli@v2
+      - run: |
+          URL=https://files.seeedstudio.com/arduino/package_seeeduino_boards_index.json
+          arduino-cli core update-index --additional-urls $URL
+          arduino-cli core install Seeeduino:nrf52 --additional-urls $URL
+          arduino-cli lib install "Adafruit NeoPixel"
+      - run: arduino-cli compile --fqbn Seeeduino:nrf52:xiaonRF52840 firmware/stacklight

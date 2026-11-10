@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "stacklight"
+version = "0.1.0"
+description = "Host software for the Office Stack Light (BLE status light)"
+requires-python = ">=3.10"
+dependencies = ["bleak>=0.22"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "pytest-asyncio>=0.23"]
+
+[project.scripts]
+stacklight = "stacklight.cli:main"
+
+[tool.setuptools]
+packages = ["stacklight"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"

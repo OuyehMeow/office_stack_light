@@ -1,0 +1,44 @@
+Office Stack Light - folder structure
+=====================================
+
+office_stack_light/
+|-- README.md                      Project overview, workflow, quick start
+|-- .gitignore
+|-- .github/
+|   `-- workflows/
+|       `-- ci.yml                 CI: host unit tests + firmware compile (arduino-cli)
+|
+|-- docs/
+|   |-- hardware.md                Part selection, BOM, wiring, power budget, enclosure brief
+|   |-- protocol.md                BLE GATT protocol (UUIDs, values, device behaviour)
+|   `-- folder_structure.txt       This file
+|
+|-- firmware/                      Runs on the light (Seeed XIAO nRF52840)
+|   |-- README.md                  Build / flash instructions, tunables
+|   `-- stacklight/
+|       `-- stacklight.ino         BLE service, LED effects, button, battery, settings
+|
+`-- host/                          Runs on the computer (Python 3.10+)
+    |-- README.md                  Install, CLI, web UI, Teams sync, autostart
+    |-- pyproject.toml             Package + optional extras: dev, teams
+    |-- stacklight/
+    |   |-- __init__.py            Version
+    |   |-- __main__.py            python -m stacklight
+    |   |-- cli.py                 Command line: states, colour, status, daemon, ui
+    |   |-- daemon.py              Keeps BLE connection, HTTP API, serves UI, Teams sync loop
+    |   |-- device.py              Real BLE client (bleak), scan / connect / read / write
+    |   |-- mock.py                Simulated light, same interface as device.py
+    |   |-- presence.py            Teams presence (Microsoft Graph) + mock provider + mapping
+    |   |-- protocol.py            UUIDs, state/effect enums, parsing and encoding
+    |   `-- ui/
+    |       `-- index.html         Phone-sized web UI (light preview + status buttons)
+    `-- tests/
+        |-- test_protocol.py       Parsing, encoding, firmware/host UUID match
+        |-- test_daemon.py         API routes, offline resync, static UI
+        `-- test_presence.py       Teams mapping, sync / manual override, mock device
+
+Data flow
+---------
+  Web UI / CLI / hotkeys --HTTP 127.0.0.1:8765--> daemon --BLE--> light
+  Teams (Graph /me/presence) --poll 30 s--> daemon (when Teams sync is on)
+  Device button --BLE notify--> daemon (turns Teams sync off)

@@ -22,6 +22,26 @@ Commands: `available`, `busy`, `meeting`, `custom`, `off`, `color RRGGBB` (sets 
 
 The first successful connect caches the device address in `~/.config/stacklight/config.json`.
 
+## Web UI
+
+Phone-sized control page served by the daemon. Try it without hardware:
+
+```bash
+stacklight ui --mock --presence mock
+```
+
+This starts the daemon with a simulated light and a scripted Teams presence feed, and opens http://127.0.0.1:8765/ in the browser. Drop `--mock` to drive the real light. Opened without a running daemon (e.g. as a plain file), the page falls back to an in-browser demo.
+
+Layout: light preview on top, status buttons below, split 1.618 : 1. Busy blinks red (1 Hz), available is constant green, meeting breathes blue (4 s), same timing as the firmware.
+
+## Teams presence (preview)
+
+`--presence teams` polls Microsoft Graph `/me/presence` every 30 s and drives the light while "Teams sync" is on. A manual change (UI, CLI, device button) turns sync off; tap "Teams sync" to resume.
+
+Mapping: Available -> available; Busy / DoNotDisturb -> busy; activity InACall / InAConferenceCall / InAMeeting / Presenting -> meeting; Away / BeRightBack / Offline -> off; unknown -> no change.
+
+Setup needs an Entra ID app registration with delegated `Presence.Read`; steps are in `stacklight/presence.py`. Install with `pip install -e 'host[teams]'`. Untested against a live tenant so far.
+
 ## Daemon (recommended)
 
 A direct CLI call has to connect over BLE each time (1-5 s). The daemon keeps the connection, reconnects automatically, re-applies the last state after a reconnect, and serves a localhost-only HTTP API:
@@ -36,7 +56,7 @@ While it runs, the CLI routes through it automatically (instant). Anything that 
 curl -X POST http://127.0.0.1:8765/state/meeting
 ```
 
-Endpoints: `GET /status`, `POST /state/<name>`, `POST /color/<RRGGBB>`, `POST /brightness/<v>`, `POST /effect/<name>`.
+Endpoints (the `/api` prefix is optional): `GET /api/status`, `POST /api/state/<name>`, `POST /api/color/<RRGGBB>`, `POST /api/brightness/<v>`, `POST /api/effect/<name>`, `POST /api/sync/<on|off>`.
 
 ## Start at login
 

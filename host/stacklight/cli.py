@@ -6,7 +6,8 @@
     stacklight brightness 40%
     stacklight effect breathe
     stacklight status
-    stacklight daemon [--port 8765] [--off-on-exit]
+    stacklight daemon [--port 8765] [--off-on-exit] [--mock] [--presence teams|mock]
+    stacklight ui [--mock] [--presence teams|mock]   (daemon + open the web UI)
 
 If the daemon is running, commands go through it (instant). Otherwise the CLI
 connects over BLE directly (1-5 s).
@@ -80,24 +81,35 @@ def main(argv: list[str] | None = None) -> None:
     sub.add_parser("effect", help="solid | breathe | blink").add_argument("value")
     sub.add_parser("status", help="show device status")
     sub.add_parser("scan", help="list nearby StackLights")
-    d = sub.add_parser("daemon", help="run background daemon with localhost HTTP API")
-    d.add_argument("--off-on-exit", action="store_true", help="turn the light off when the daemon stops")
-    d.add_argument("--initial", help="state to apply on first connect, e.g. available")
+    for name, help_ in (("daemon", "run background daemon with web UI + localhost HTTP API"),
+                        ("ui", "run the daemon and open the web UI in the browser")):
+        d = sub.add_parser(name, help=help_)
+        d.add_argument("--off-on-exit", action="store_true", help="turn the light off when the daemon stops")
+        d.add_argument("--initial", help="state to apply on first connect, e.g. available")
+        d.add_argument("--mock", action="store_true", help="simulated device, no hardware needed")
+        d.add_argument("--presence", choices=["teams", "mock"], help="follow Teams presence (mock = scripted)")
 
     a = ap.parse_args(argv)
-    logging.basicConfig(level=logging.INFO if a.verbose or a.cmd == "daemon" else logging.WARNING,
+    logging.basicConfig(level=logging.INFO if a.verbose or a.cmd in ("daemon", "ui") else logging.WARNING,
                         format="%(asctime)s %(levelname)s %(message)s")
 
     if a.cmd == "scan":
         asyncio.run(_scan())
         return
-    if a.cmd == "daemon":
+    if a.cmd in ("daemon", "ui"):
         from .daemon import run
         initial = p.parse_state(a.initial) if a.initial else None
+        on_ready = None
+        if a.cmd == "ui":
+            import webbrowser
+            on_ready = lambda url: (print(f"Open {url}", flush=True), webbrowser.open(url))  # noqa: E731
         try:
-            asyncio.run(run(a.port, a.address, a.off_on_exit, initial))
+            asyncio.run(run(a.port, a.address, a.off_on_exit, initial,
+                            mock=a.mock, presence=a.presence, on_ready=on_ready))
         except KeyboardInterrupt:
             pass
+        except RuntimeError as e:
+            raise SystemExit(f"error: {e}")
         return
 
     arg = getattr(a, "value", None)

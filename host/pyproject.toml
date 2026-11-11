@@ -4,19 +4,23 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "stacklight"
-version = "0.1.0"
+version = "0.2.0"
 description = "Host software for the Office Stack Light (BLE status light)"
 requires-python = ">=3.10"
 dependencies = ["bleak>=0.22"]
 
 [project.optional-dependencies]
 dev = ["pytest>=8", "pytest-asyncio>=0.23"]
+teams = ["msal>=1.28"]
 
 [project.scripts]
 stacklight = "stacklight.cli:main"
 
 [tool.setuptools]
 packages = ["stacklight"]
+
+[tool.setuptools.package-data]
+stacklight = ["ui/*.html"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

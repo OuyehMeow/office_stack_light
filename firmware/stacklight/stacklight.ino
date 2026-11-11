@@ -13,7 +13,7 @@ using namespace Adafruit_LittleFS_Namespace;
 
 // ---------------------------------------------------------------- config
 #define DEVICE_NAME            "StackLight"
-#define FW_VERSION             "0.1.0"
+#define FW_VERSION             "0.2.0"
 
 #define LED_PIN                D0        // -> 330R -> LED DIN
 #define LED_COUNT              7         // Jewel 7. Set to 1 for a single LED.
@@ -93,6 +93,17 @@ static void baseColor(uint8_t s, uint8_t& r, uint8_t& g, uint8_t& b) {
     case ST_MEETING:   r = 0;   g = 0;   b = 255; break;
     case ST_CUSTOM:    r = cfg.custom[0]; g = cfg.custom[1]; b = cfg.custom[2]; break;
     default:           r = 0;   g = 0;   b = 0;   break;
+  }
+}
+
+// Fixed effect per status so the light reads at a glance; the effect setting only drives the custom slot.
+static uint8_t effectFor(uint8_t s) {
+  switch (s) {
+    case ST_AVAILABLE: return FX_SOLID;    // green, constant
+    case ST_BUSY:      return FX_BLINK;    // red, blinking
+    case ST_MEETING:   return FX_BREATHE;  // blue, breathing
+    case ST_CUSTOM:    return cfg.effect;
+    default:           return FX_SOLID;
   }
 }
 
@@ -237,7 +248,7 @@ static void render(uint32_t now) {
   if (battMv < CUTOFF_BATT_MV) {
     level = 0;
   } else if (state != ST_OFF) {
-    switch (cfg.effect) {
+    switch (effectFor(state)) {
       case FX_BREATHE: {
         // 4 s triangle wave, 20 %..100 %
         uint32_t t = now % 4000;
@@ -334,6 +345,6 @@ void loop() {
   render(now);
 
   // Solid colour needs no refresh; animate at 40 Hz only when needed.
-  bool animating = state != ST_OFF && cfg.effect != FX_SOLID;
+  bool animating = state != ST_OFF && effectFor(state) != FX_SOLID;
   delay(animating ? 25 : 100);  // FreeRTOS tickless idle: CPU sleeps here
 }

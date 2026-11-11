@@ -50,7 +50,8 @@ async def test_offline_then_resync():
     assert code == 200 and body["applied"] is False
     await route(c, "POST", "/color/010203")
     assert light.calls == []
-    assert (await route(c, "GET", "/status"))[1] == {"connected": False, "desired_state": "meeting"}
+    st = (await route(c, "GET", "/status"))[1]
+    assert st["connected"] is False and st["desired_state"] == "meeting" and st["source"] == "manual"
     light.connected = True
     await c.resync()
     assert light.calls == [("color", (1, 2, 3)), ("state", p.State.MEETING)]
@@ -61,3 +62,13 @@ async def test_device_button_updates_desired():
     c = Controller(light)
     light.on_state(p.State.AVAILABLE)
     assert c.desired.state is p.State.AVAILABLE
+
+
+async def test_api_prefix_and_static_ui():
+    from stacklight.daemon import _static
+
+    c = Controller(FakeLight())
+    assert (await route(c, "POST", "/api/state/meeting"))[0] == 200
+    html, ctype = _static("/")
+    assert ctype.startswith("text/html") and b"Stack Light" in html
+    assert _static("/etc/passwd") is None

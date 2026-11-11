@@ -7,7 +7,8 @@ A palm-size, battery-powered BLE status light for the desk: green available, red
 - `docs/hardware.md`: board and part selection, BOM, wiring, power budget, enclosure design brief.
 - `docs/protocol.md`: BLE GATT protocol.
 - `firmware/`: Arduino firmware for the Seeed XIAO nRF52840.
-- `host/`: Python CLI + background daemon (Windows / macOS / Linux).
+- `host/`: Python CLI, background daemon and phone-sized web UI (Windows / macOS / Linux), with a mock device and Teams presence sync.
+- `docs/folder_structure.txt`: annotated folder tree.
 
 ## Workflow
 
@@ -21,3 +22,5 @@ A palm-size, battery-powered BLE status light for the desk: green available, red
 1. Buy the parts in `docs/hardware.md` section 3.
 2. Flash the firmware: `firmware/README.md`.
 3. `pip install -e host`, then `stacklight scan` and `stacklight busy`.
+
+No hardware yet: `pip install -e host && stacklight ui --mock --presence mock`.

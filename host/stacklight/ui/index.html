@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#101010">
+<title>Stack Light</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --stage: #101010;
+    --paper: #f3f0e8;
+    --ink: #161513;
+    --muted: #7a756c;
+    --line: #dcd6ca;
+    --serif: "Instrument Serif", "Iowan Old Style", Georgia, serif;
+    --sans: "Inter Tight", system-ui, -apple-system, "Segoe UI", sans-serif;
+    /* current light colour, set per state below */
+    --rgb: 52, 211, 110;
+    --on: 1;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    background: #d9d5cc;
+    color: var(--ink);
+    font-family: var(--sans);
+    -webkit-font-smoothing: antialiased;
+    display: grid;
+    place-items: center;
+  }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+
+  /* Phone frame: full screen on a phone, a 390 x 844 card on a desktop */
+  .app {
+    width: 100%;
+    height: 100dvh;
+    display: grid;
+    grid-template-rows: minmax(0, 1.618fr) minmax(0, 1fr);   /* golden ratio: 61.8 % / 38.2 % */
+    overflow: hidden;
+    background: var(--paper);
+  }
+  @media (min-width: 520px) {
+    .app { width: 390px; height: 844px; border-radius: 28px; box-shadow: 0 30px 80px rgba(0,0,0,.18); }
+  }
+
+  /* ---------------------------------------------------------------- stage (top) */
+  .stage {
+    position: relative;
+    background: var(--stage);
+    color: #ece8df;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    padding: 18px 22px 22px;
+    overflow: hidden;
+  }
+  .masthead {
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #8d887f;
+    position: relative; z-index: 2;
+  }
+  .masthead .title { font-family: var(--serif); font-size: 17px; letter-spacing: .02em; text-transform: none; color: #ece8df; }
+
+  .ambient {
+    position: absolute; inset: 0;
+    background: radial-gradient(60% 45% at 50% 62%, rgba(var(--rgb), .22), rgba(var(--rgb), 0) 70%);
+    pointer-events: none;
+  }
+
+  .lamp-wrap { position: relative; display: grid; place-items: center; z-index: 1; }
+  .lamp {
+    --w: clamp(108px, 34vw, 136px);
+    width: var(--w);
+    height: calc(var(--w) * 2.05);
+    display: grid;
+    grid-template-rows: 1fr 27%;
+    position: relative;
+  }
+
+  /* Frosted dome. Light source sits at the bottom centre, where the LED board is. */
+  .dome {
+    position: relative;
+    border-radius: 999px 999px 6px 6px;
+    overflow: hidden;
+    background: rgba(255,255,255,.045);
+    box-shadow:
+      inset 0 0 0 1px rgba(255,255,255,.10),
+      inset 10px 0 22px rgba(255,255,255,.05),
+      inset -6px 0 18px rgba(0,0,0,.25);
+    isolation: isolate;
+  }
+  .glow {
+    position: absolute; inset: -10% -25% -14%;
+    background:
+      radial-gradient(42% 26% at 50% 100%, rgba(255,255,255,.95), rgba(255,255,255,0) 70%),
+      radial-gradient(60% 55% at 50% 100%, rgba(var(--rgb), 1), rgba(var(--rgb), .55) 45%, rgba(var(--rgb), 0) 100%),
+      radial-gradient(80% 95% at 50% 100%, rgba(var(--rgb), .35), rgba(var(--rgb), 0) 100%);
+    filter: blur(10px);
+    opacity: var(--on);
+  }
+  .frost {
+    position: absolute; inset: 0; z-index: 2;
+    -webkit-backdrop-filter: blur(6px) saturate(1.2);
+    backdrop-filter: blur(6px) saturate(1.2);
+    background:
+      linear-gradient(90deg, rgba(255,255,255,.16) 0%, rgba(255,255,255,0) 22%, rgba(255,255,255,0) 78%, rgba(255,255,255,.06) 100%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    mix-blend-mode: soft-light;
+    opacity: .9;
+  }
+  .base {
+    background: #232220;
+    border-radius: 4px 4px 12px 12px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+    position: relative;
+  }
+  .base::after { /* USB-C port, a nod to the hardware */
+    content: ""; position: absolute; left: 50%; bottom: 22%; width: 18%; height: 5px;
+    transform: translateX(-50%); border-radius: 3px; background: #121212;
+  }
+  .pool {
+    position: absolute; left: 50%; bottom: -14px; width: 220%; height: 34px; transform: translateX(-50%);
+    background: radial-gradient(50% 50% at 50% 50%, rgba(var(--rgb), .18), rgba(var(--rgb), 0) 70%);
+    opacity: var(--on);
+  }
+
+  .readout { text-align: center; position: relative; z-index: 2; }
+  .word { font-family: var(--serif); font-style: italic; font-weight: 400; font-size: 46px; line-height: 1; letter-spacing: -.01em; }
+  .meta { margin-top: 8px; font-size: 12px; color: #8d887f; letter-spacing: .02em; }
+
+  /* states */
+  .app[data-state="available"] { --rgb: 46, 204, 106; }
+  .app[data-state="busy"]      { --rgb: 255, 52, 40; }
+  .app[data-state="meeting"]   { --rgb: 44, 104, 255; }
+  .app[data-state="custom"]    { --rgb: var(--custom-rgb, 255, 120, 0); }
+  .app[data-state="off"]       { --rgb: 120, 120, 120; --on: 0; }
+  .app[data-state="off"] .frost { opacity: .35; }
+
+  /* Effects, matched to firmware timing: blink 1 Hz 50 % duty, breathe 4 s 20-100 % */
+  .fx-blink   .glow, .fx-blink   .ambient, .fx-blink   .pool { animation: blink 1s linear infinite; }
+  .fx-breathe .glow, .fx-breathe .ambient, .fx-breathe .pool { animation: breathe 4s ease-in-out infinite; }
+  @keyframes blink   { 0%, 46% { opacity: 1; } 50%, 96% { opacity: .04; } 100% { opacity: 1; } }
+  @keyframes breathe { 0%, 100% { opacity: .2; } 50% { opacity: 1; } }
+
+  /* ---------------------------------------------------------------- controls (bottom) */
+  .controls { display: grid; grid-template-rows: auto 1fr auto; padding: 14px 22px calc(16px + env(safe-area-inset-bottom)); }
+  .controls-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted);
+    padding-bottom: 8px; border-bottom: 1px solid var(--ink);
+  }
+  .conn::before { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #b9b3a7; margin-right: 6px; vertical-align: 1px; }
+  .conn.ok::before { background: #2ecc6a; }
+  .conn.warn::before { background: #e0a100; }
+
+  .list { display: grid; align-content: center; }
+  .row {
+    display: grid; grid-template-columns: 14px 1fr auto; align-items: center; gap: 12px;
+    width: 100%; text-align: left; padding: 11px 10px; margin: 0 -10px; width: calc(100% + 20px);
+    border-bottom: 1px solid var(--line);
+    transition: background .15s, color .15s;
+  }
+  .row:last-child { border-bottom: 0; }
+  .row .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .row .name { font-family: var(--serif); font-size: 26px; line-height: 1.05; }
+  .row .hint { font-size: 12px; color: var(--muted); letter-spacing: .02em; }
+  .row[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-radius: 2px; border-bottom-color: transparent; }
+  .row[aria-pressed="true"] .hint { color: #aaa49a; }
+  .row:active { transform: translateY(1px); }
+
+  .foot { display: flex; gap: 10px; }
+  .chip {
+    flex: 1; padding: 10px 12px; border: 1px solid var(--ink); border-radius: 999px;
+    font-size: 13px; display: flex; justify-content: center; gap: 6px; align-items: center;
+  }
+  .chip[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+  .chip:disabled { border-color: var(--line); color: #b3ada2; cursor: not-allowed; }
+  .chip .sub { color: var(--muted); }
+  .chip[aria-pressed="true"] .sub { color: #aaa49a; }
+
+  .toast {
+    position: absolute; left: 50%; top: 14px; transform: translate(-50%, -64px); opacity: 0;
+    background: var(--ink); color: var(--paper); font-size: 12px; padding: 8px 14px; border-radius: 999px;
+    transition: transform .25s, opacity .25s; z-index: 10; white-space: nowrap;
+  }
+  .toast.show { transform: translate(-50%, 0); opacity: 1; }
+</style>
+</head>
+<body>
+<main class="app fx-solid" id="app" data-state="available">
+  <section class="stage" aria-live="polite">
+    <div class="ambient"></div>
+    <div class="masthead">
+      <span class="title">Stack Light</span>
+      <span id="battery">--</span>
+    </div>
+    <div class="lamp-wrap">
+      <div class="lamp" aria-hidden="true">
+        <div class="dome"><div class="glow"></div><div class="frost"></div></div>
+        <div class="base"></div>
+        <div class="pool"></div>
+      </div>
+    </div>
+    <div class="readout">
+      <h1 class="word" id="word">Available</h1>
+      <p class="meta" id="meta">Constant</p>
+    </div>
+    <div class="toast" id="toast"></div>
+  </section>
+
+  <section class="controls">
+    <div class="controls-head">
+      <span>Set status</span>
+      <span class="conn" id="conn">Connecting</span>
+    </div>
+    <div class="list" role="group" aria-label="Status">
+      <button class="row" data-set="available" aria-pressed="false">
+        <span class="dot" style="background:#2ecc6a"></span><span class="name">Available</span><span class="hint">Constant</span>
+      </button>
+      <button class="row" data-set="busy" aria-pressed="false">
+        <span class="dot" style="background:#ff3428"></span><span class="name">Busy</span><span class="hint">Blinking</span>
+      </button>
+      <button class="row" data-set="meeting" aria-pressed="false">
+        <span class="dot" style="background:#2c68ff"></span><span class="name">Meeting</span><span class="hint">Breathing</span>
+      </button>
+    </div>
+    <div class="foot">
+      <button class="chip" data-set="off" aria-pressed="false">Light off</button>
+      <button class="chip" id="sync" aria-pressed="false" disabled>Teams sync <span class="sub" id="syncSub">n/a</span></button>
+    </div>
+  </section>
+</main>
+
+<script>
+(() => {
+  const STATES = {
+    available: { word: "Available", fx: "solid",   hint: "Constant" },
+    busy:      { word: "Busy",      fx: "blink",   hint: "Blinking" },
+    meeting:   { word: "In a meeting", fx: "breathe", hint: "Breathing" },
+    custom:    { word: "Custom",    fx: "solid",   hint: "Custom slot" },
+    off:       { word: "Off",       fx: "solid",   hint: "Light off" },
+  };
+  const $ = (id) => document.getElementById(id);
+  const app = $("app");
+
+  // Live = talking to the stacklight daemon. Demo = page opened without a daemon:
+  // keep working with a local in-browser state so the UI can still be tried.
+  let mode = "live";
+  let last = null;
+  const demo = { connected: true, demo: true, state: "available", battery_percent: 87,
+                 source: "manual", since: Date.now() / 1000, sync: { available: false, enabled: false } };
+
+  async function api(method, path) {
+    const r = await fetch("/api" + path, { method, cache: "no-store" });
+    const body = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(body.error || r.statusText);
+    return body;
+  }
+
+  function hexToRgb(h) {
+    const v = parseInt(h || "ff7800", 16);
+    return `${v >> 16 & 255}, ${v >> 8 & 255}, ${v & 255}`;
+  }
+
+  function timeStr(ts) {
+    return new Date(ts * 1000).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  }
+
+  function render(s) {
+    last = s;
+    const state = s.connected ? s.state : (s.desired_state || "off");
+    const def = STATES[state] || STATES.off;
+    app.dataset.state = state;
+    app.className = "app fx-" + def.fx;
+    if (s.custom_color) app.style.setProperty("--custom-rgb", hexToRgb(s.custom_color));
+
+    $("word").textContent = def.word;
+    const src = s.source && s.source !== "manual" ? ` · via ${s.source === "device" ? "button" : "Teams"}` : "";
+    $("meta").textContent = `${def.hint} · since ${timeStr(s.since || Date.now() / 1000)}${src}`;
+
+    document.querySelectorAll("[data-set]").forEach((b) =>
+      b.setAttribute("aria-pressed", String(b.dataset.set === state)));
+
+    const conn = $("conn");
+    if (mode === "demo") { conn.textContent = "Demo, no daemon"; conn.className = "conn warn"; }
+    else if (!s.connected) { conn.textContent = "Searching"; conn.className = "conn warn"; }
+    else { conn.textContent = s.mock ? "Mock device" : "Connected"; conn.className = "conn ok"; }
+
+    $("battery").textContent = s.connected && s.battery_percent != null ? `Battery ${s.battery_percent}%` : "--";
+
+    const sync = s.sync || {};
+    const btn = $("sync");
+    btn.disabled = !sync.available;
+    btn.setAttribute("aria-pressed", String(!!sync.enabled));
+    $("syncSub").textContent = !sync.available ? "n/a" : sync.enabled ? (sync.presence || "on") : "off";
+    btn.title = sync.error ? "Teams error: " + sync.error : !sync.available ? "Start the daemon with --presence teams" : "";
+  }
+
+  let toastTimer;
+  function toast(msg) {
+    const t = $("toast");
+    t.textContent = msg; t.classList.add("show");
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove("show"), 2200);
+  }
+
+  async function refresh() {
+    if (mode === "demo") return render(demo);
+    try { render(await api("GET", "/status")); }
+    catch (e) { mode = "demo"; render(demo); }
+  }
+
+  async function setState(state) {
+    if (navigator.vibrate) navigator.vibrate(8);
+    // Optimistic: show it immediately, then confirm from the daemon.
+    const optimistic = { ...(last || demo), connected: true, state, source: "manual",
+                         since: Date.now() / 1000, sync: { ...((last || demo).sync || {}), enabled: false } };
+    render(optimistic);
+    if (mode === "demo") { Object.assign(demo, optimistic); return; }
+    try {
+      const r = await api("POST", "/state/" + state);
+      if (!r.applied) toast("Saved. Will apply when the light connects.");
+    } catch (e) { toast(e.message); }
+    refresh();
+  }
+
+  document.querySelectorAll("[data-set]").forEach((b) =>
+    b.addEventListener("click", () => setState(b.dataset.set)));
+
+  $("sync").addEventListener("click", async () => {
+    const on = $("sync").getAttribute("aria-pressed") !== "true";
+    try { await api("POST", "/sync/" + (on ? "on" : "off")); toast(on ? "Following Teams presence" : "Teams sync off"); }
+    catch (e) { toast(e.message); }
+    refresh();
+  });
+
+  refresh();
+  setInterval(refresh, 1500);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) refresh(); });
+})();
+</script>
+</body>
+</html>

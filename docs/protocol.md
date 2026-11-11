@@ -9,7 +9,9 @@ Custom service `7f3a1000-8c2e-4d5b-9e61-3a2f5c7b9d01`
   Invalid values are rejected. Notifies when changed by the button on the device.
 - Custom colour `7f3a1002-...`: 3 bytes R, G, B, read / write. Used by state 4. Persisted in flash.
 - Brightness `7f3a1003-...`: 1 byte 0-255, read / write. Clamped to 160 by firmware. Persisted.
-- Effect `7f3a1004-...`: 1 byte, read / write. 0 solid, 1 breathe (4 s), 2 blink (1 Hz). Persisted.
+- Effect `7f3a1004-...`: 1 byte, read / write. 0 solid, 1 breathe (4 s), 2 blink (1 Hz). Applies to the custom slot only. Persisted.
+
+Fixed effect per state (firmware 0.2+): available = green solid, busy = red blink (1 Hz, 50 % duty), meeting = blue breathe (4 s, 20-100 %). The web UI uses the same timing.
 
 Standard services
 - Battery Service 0x180F, Battery Level 0x2A19 (percent, notify every 30 s while connected).

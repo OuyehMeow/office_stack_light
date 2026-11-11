@@ -8,6 +8,13 @@ office_stack_light/
 |   `-- workflows/
 |       `-- ci.yml                 CI: host unit tests + firmware compile (arduino-cli)
 |
+|-- cad/
+|   |-- README.md                  Where each 3D model came from, what is still missing
+|   `-- vendor/
+|       `-- adafruit-neopixel-jewel-7/
+|           |-- adafruit-2226-neopixel-jewel-7.step   LED board STEP (Adafruit, MIT)
+|           `-- LICENSE
+|
 |-- docs/
 |   |-- hardware.md                Part selection, BOM, wiring, power budget, enclosure brief
 |   |-- protocol.md                BLE GATT protocol (UUIDs, values, device behaviour)

@@ -59,6 +59,21 @@ Total electronics + hardware: about $30 per unit (excluding filament and tools).
 
 Tools: fine-tip soldering iron, flush cutters, multimeter (to check battery polarity before connecting), hot glue or CA glue for magnets.
 
+## 3a. As ordered (2026-11) and still missing
+
+Ordered
+- Amazon: Seeed XIAO nRF52840 pre-soldered x2, 100 uF 35 V radial capacitors x15, 330 ohm 1/2 W resistors x100.
+- Adafruit: NeoPixel Jewel 7 (2226) x1, SPDT slide switch (805) x1, tactile switches 6 mm tall (1490) x10.
+
+Still needed per unit
+1. LiPo 1S 1000 mAh with protection PCM, 803040 size preferred. Check the connector is JST-PH 2.0 mm (many listings use 1.25 mm or bare wires).
+2. Matching JST-PH 2-pin female pigtail from the same vendor (polarity is vendor-specific), or skip the connector and solder the battery leads to the switch.
+3. N52 disc magnets 10 x 3 mm, 6 per unit.
+4. 26-28 AWG silicone wire, heat-shrink, Kapton tape.
+5. If screw-joined: M2 x 6 screws + M2 heat-set inserts.
+
+Quantity check for two prototypes: 2 XIAO ordered, but only 1 Jewel and 1 slide switch. Add 1 Jewel (2226) and 1-2 slide switches (805) for unit 2.
+
 ## 4. Wiring
 
 XIAO nRF52840 pin use
@@ -98,11 +113,14 @@ Peak current: firmware caps brightness at 160/255; worst case single colour abou
 ## 6. Enclosure design brief (for your CAD)
 
 Component envelopes (add 0.3-0.5 mm clearance per side; vendor dimensions vary)
-- XIAO nRF52840: 21.0 x 17.8 mm PCB, about 4.5 mm tall including the USB-C receptacle (on top side), plus about 1 mm for wires on BAT pads below. USB-C receptacle is centred on one short edge and sits flush with the PCB edge.
-- Jewel 7: 23 mm diameter, about 4 mm thick, solder pads on the back; leave 4 mm behind it for wires and the capacitor.
-- Battery 803040: 8 x 30 x 40 mm plus about 3 mm PCM/lead at one end. Design the pocket 9 x 32 x 45 mm and plan for swelling: do not clamp it tight.
-- Slide switch: body 8.6 x 3.6 x 3.5 mm, actuator about 1.5 x 1.5 mm, travel 2 mm; wall slot about 2.5 x 5 mm.
-- Tactile switch: 6 x 6 mm body; use the 9.5 mm version if the wall is thick, or print a plunger.
+- XIAO nRF52840, no headers (enclosure build): 21.0 x 17.8 mm PCB, about 4.5 mm tall including the USB-C receptacle (on top side), plus about 1 mm for wires on BAT pads below. USB-C receptacle is centred on one short edge and sits flush with the PCB edge.
+- XIAO nRF52840, pre-soldered headers (as ordered on Amazon): same PCB, but the pin rows add about 2.5 mm plastic + 6 mm pins below the board (about 13 mm total height) and partly block the BAT pads. Use these for breadboard bring-up; for the enclosure either use an unsoldered board or clip the pins flush and design for a 4.5 mm board + about 3 mm of header plastic.
+- Jewel 7 (Adafruit 2226, as ordered): 23 mm diameter, about 4 mm thick, solder pads on the back; leave 4 mm behind it for wires.
+- Capacitor (as ordered: 100 uF 35 V radial, 6 mm dia x 12 mm + leads): too tall to stand behind the Jewel. Lay it flat (needs a 6.5 mm x 14 mm slot) beside the XIAO sled, or bend it sideways behind the Jewel and reserve 7 mm depth there.
+- Resistor (as ordered: 330 ohm 1/2 W axial, body about 3.5 mm dia x 9 mm): in-line on the data wire under heat-shrink, no pocket needed.
+- Battery 803040 (not yet ordered): 8 x 30 x 40 mm plus about 3 mm PCM/lead at one end. Design the pocket 9 x 32 x 45 mm and plan for swelling: do not clamp it tight. A common 1000 mAh 503450/603450-class cell (about 6 x 34 x 51 mm) will not lie flat inside a 50-56 mm capsule: either grow the capsule to about 60 mm or stand the cell on edge.
+- Slide switch (as ordered: Adafruit 805, E-Switch EG1218 type): 3 pins at 2.54 mm, slide travel 3 mm. Body is larger than the SS12D00G3 originally listed; I could not confirm exact body dimensions, so reserve about 13 x 5 x 6 mm and measure on arrival. Wall slot = actuator width + 0.5 mm by actuator length + 3 mm travel + 0.5 mm.
+- Tactile switch (as ordered: Adafruit 1490, Omron B3F-40xx footprint): 6.1 x 6.1 mm base, about 4 mm body. Vendor listings disagree on height (6 mm nominal vs about 12 mm button top above PCB); reserve 12 mm and measure on arrival. Mount it on a printed bracket so the button pushes through a 4 mm hole, or add a printed plunger.
 - Magnets: pockets 10.2 mm dia x 3.2 mm deep, glue in. Leave 0.6-0.8 mm plastic skin to the outside (more skin = much weaker hold).
 
 Suggested overall size

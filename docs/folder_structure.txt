@@ -9,11 +9,20 @@ office_stack_light/
 |       `-- ci.yml                 CI: host unit tests + firmware compile (arduino-cli)
 |
 |-- cad/
-|   |-- README.md                  Where each 3D model came from, what is still missing
+|   |-- README.md                  Model sources, licenses, measured dimensions
+|   |-- XIAO-nRF52840-DXF/102010448/
+|   |   |-- top.dxf                XIAO 2D drawing, top (Seeed official)
+|   |   `-- bottom.dxf             XIAO 2D drawing, bottom
+|   |-- seeed-studio-xiao-nrf52840-1.snapshot.5/
+|   |   |-- XIAO-nRF52840 v15.step XIAO 3D model (Seeed, GrabCAD)
+|   |   `-- *.png                  Renders
+|   |-- scripts/
+|   |   `-- make_lipo.py           Generates LiPo envelope STEP for any size (CadQuery)
 |   `-- vendor/
-|       `-- adafruit-neopixel-jewel-7/
-|           |-- adafruit-2226-neopixel-jewel-7.step   LED board STEP (Adafruit, MIT)
-|           `-- LICENSE
+|       |-- adafruit-neopixel-jewel-7/   LED board STEP (Adafruit, MIT) + LICENSE
+|       |-- generic-lipo/                lipo-803040.step (generated envelope)
+|       |-- slide-switch-ss12d00g3/      Power switch STEP (third-party, fit reference)
+|       `-- tact-switch-6mm/             Button STEP, 7.3 / 9.5 mm (KiCad) + LICENSE
 |
 |-- docs/
 |   |-- hardware.md                Part selection, BOM, wiring, power budget, enclosure brief

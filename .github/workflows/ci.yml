@@ -17,12 +17,32 @@ jobs:
 
   firmware:
     runs-on: ubuntu-latest
+    env:
+      BOARDS_URL: https://files.seeedstudio.com/arduino/package_seeeduino_boards_index.json
+      FQBN: Seeeduino:nrf52:xiaonRF52840
+      CORE: Seeeduino:nrf52@1.1.13
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      # The Seeed core calls adafruit-nrfutil after linking to build the DFU package.
+      - run: pip install adafruit-nrfutil
       - uses: arduino/setup-arduino-cli@v2
       - run: |
-          URL=https://files.seeedstudio.com/arduino/package_seeeduino_boards_index.json
-          arduino-cli core update-index --additional-urls $URL
-          arduino-cli core install Seeeduino:nrf52 --additional-urls $URL
+          arduino-cli core update-index --additional-urls "$BOARDS_URL"
+          arduino-cli core install "$CORE" --additional-urls "$BOARDS_URL"
           arduino-cli lib install "Adafruit NeoPixel"
-      - run: arduino-cli compile --fqbn Seeeduino:nrf52:xiaonRF52840 firmware/stacklight
+      - run: arduino-cli compile --fqbn "$FQBN" --output-dir build firmware/stacklight
+      - name: Make UF2 (drag-and-drop file for the bootloader drive)
+        run: |
+          UF2CONV=$(find ~/.arduino15/packages/Seeeduino/hardware/nrf52 -name uf2conv.py | head -1)
+          python "$UF2CONV" -f 0xADA52840 -c -o build/stacklight.uf2 build/stacklight.ino.hex
+          ls -la build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stacklight-firmware
+          path: |
+            build/stacklight.uf2
+            build/stacklight.ino.hex
+            build/stacklight.ino.zip

@@ -110,6 +110,20 @@ Run time on 1000 mAh (about 900 mAh usable above 3.4 V): about 36 h, about 4 wor
 Charge time at 100 mA: about 10-12 h (overnight).
 Peak current: firmware caps brightness at 160/255; worst case single colour about 90 mA, white is not used.
 
+## 5a. Charging (how it works)
+
+Path: USB-C 5 V (VBUS) -> BQ25101 linear Li-ion charger on the XIAO -> BAT+ pad -> slide switch -> cell. No extra parts needed.
+
+- Profile: standard CC/CV. Constant current until the cell reaches 4.2 V, then constant voltage while the current tapers; the charger stops when the current falls to a small fraction of the set value.
+- Current: set by a resistor on the charger's ISET pin. A second resistor can be switched in parallel by P0.13: floating = 50 mA (default, e.g. in the bootloader), driven LOW = 100 mA. The firmware drives it LOW at boot.
+- Indicator: the charger's status output drives the XIAO's charge LED next to the USB-C port: on while charging, off when done or with no battery.
+- Board power: with USB plugged in, the XIAO's 3.3 V regulator is fed from USB; unplugged, from the battery. Check the exact power path in Seeed's schematic (Seeed-Studio-XIAO-nRF52840-Sense-v1.1.pdf) before relying on details.
+- Our wiring: the LEDs hang on the BAT+ node, so while lit on USB they take part of the 100 mA (about 25 mA). Net charge current is about 75 mA, so a full charge takes longer (about 13-15 h from empty with the light on, 10-12 h with the light off).
+- Side effect of that load: the charger measures total current out of BAT+, so with the LEDs drawing more than its termination threshold it may never report "done" and holds the cell at 4.2 V. Safe (the charger still regulates 4.2 V and the cell has its own protection board), but a cell kept at 100 % ages faster. If the light lives on USB permanently, consider a lower brightness or turning the light off at night.
+- Switch must be ON to charge (it is in the battery line).
+- Safety: the cell's own PCM handles over-charge, over-discharge and short circuit as a second layer; the charger is the first. Do not charge a swollen or damaged cell.
+- Chargers: any 5 V USB port or adapter. If a USB-C-to-C charger gives nothing, try a USB-A-to-C cable (some C chargers only output power after USB-C negotiation).
+
 ## 6. Enclosure design brief (for your CAD)
 
 Component envelopes (add 0.3-0.5 mm clearance per side; vendor dimensions vary)
@@ -145,7 +159,7 @@ Nice-to-have
 
 ## 7. Bring-up order
 
-1. Flash firmware to the bare XIAO over USB (see firmware/README.md). Check it advertises as "StackLight" (`stacklight scan`).
+1. Flash firmware to the bare XIAO over USB (see firmware/README.md, "Flash process"). Check it advertises as "StackLight" (`stacklight scan`).
 2. Wire the Jewel + resistor + capacitor. The LEDs are powered from the battery node only, so connect the battery (switch ON) to test colours: `stacklight busy`, `stacklight meeting`, button presses.
 3. Check battery polarity, connect battery through the switch, confirm charging (XIAO charge LED on with USB).
 4. Measure current with the switch replaced by a multimeter in series: running about 25 mA expected.

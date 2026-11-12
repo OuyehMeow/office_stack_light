@@ -6,7 +6,7 @@ office_stack_light/
 |-- .gitignore
 |-- .github/
 |   `-- workflows/
-|       `-- ci.yml                 CI: host unit tests + firmware compile (arduino-cli)
+|       `-- ci.yml                 CI: host tests + firmware compile, publishes stacklight.uf2
 |
 |-- cad/
 |   |-- README.md                  Model sources, licenses, measured dimensions
@@ -30,7 +30,9 @@ office_stack_light/
 |   `-- folder_structure.txt       This file
 |
 |-- firmware/                      Runs on the light (Seeed XIAO nRF52840)
-|   |-- README.md                  Build / flash instructions, tunables
+|   |-- README.md                  Flash process (UF2 / script / IDE), troubleshooting, tunables
+|   |-- flash.sh                   Build + upload script, macOS / Linux
+|   |-- flash.ps1                  Build + upload script, Windows
 |   `-- stacklight/
 |       `-- stacklight.ino         BLE service, LED effects, button, battery, settings
 |

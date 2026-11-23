@@ -25,6 +25,7 @@ office_stack_light/
 |       `-- tact-switch-6mm/             Button STEP, 7.3 / 9.5 mm (KiCad) + LICENSE
 |
 |-- docs/
+|   |-- HANDOFF.md                 Project status, open issues, next steps (start here)
 |   |-- hardware.md                Part selection, BOM, wiring, power budget, enclosure brief
 |   |-- protocol.md                BLE GATT protocol (UUIDs, values, device behaviour)
 |   `-- folder_structure.txt       This file

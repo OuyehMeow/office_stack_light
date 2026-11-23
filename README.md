@@ -4,6 +4,7 @@ A palm-size, battery-powered BLE status light for the desk: green available, red
 
 ## Layout
 
+- `docs/HANDOFF.md`: current status, open issues, next steps. Start here.
 - `docs/hardware.md`: board and part selection, BOM, wiring, power budget, enclosure design brief.
 - `docs/protocol.md`: BLE GATT protocol.
 - `firmware/`: Arduino firmware for the Seeed XIAO nRF52840.
